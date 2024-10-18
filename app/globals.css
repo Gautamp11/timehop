@@ -2,26 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* globals.css */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.hero {
+  background: linear-gradient(45deg, #1e293b, #0f172a, #1e293b);
+  background-size: 300% 300%;
+  animation: gradient 5s ease infinite;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@keyframes float {
+  0% {
+    transform: translate(-300px, -300px) rotate(360deg); /* Starting position */
   }
+  25% {
+    transform: translate(150px, -100px) rotate(12deg); /* Move left and up */
+  }
+  50% {
+    transform: translate(200px, -250px) rotate(-12deg); /* Move right and slightly down */
+  }
+  75% {
+    transform: translate(-300px, 200px) rotate(360deg); /* Move back left and slightly up */
+  }
+  100% {
+    transform: translate(-300px, -300px) rotate(0deg); /* Return to original position */
+  }
+}
+
+/* Apply the float animation */
+.animate-float {
+  animation: float 35s ease-in-out infinite; /* Adjusted duration for smoother effect */
 }
