@@ -22,6 +22,7 @@ export default function Hero() {
           left: "50%", // Center horizontally (you can adjust this as needed)
           transform: "translate(-50%, -50%)", // Center the image
           zIndex: 0, // Ensure it is behind the text but in front of the background
+          opacity: 0.8, //
         }}
         src="/capsule-1.png"
         alt="bg-capsule"
