@@ -8,6 +8,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { CapsulesProvider } from "./_contexts/CapsulesContext";
 
 // If loading a variable font, you don't need to specify the font weight
 const exo = Exo({
@@ -17,15 +18,17 @@ const exo = Exo({
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={exo.className}>
-        <body className="bg-primary-800">
-          <Navbar />
-          <main className="flex mx-auto max-w-6xl justify-center">
-            {children}
-          </main>
-        </body>
-      </html>
-    </ClerkProvider>
+    <CapsulesProvider>
+      <ClerkProvider>
+        <html lang="en" className={exo.className}>
+          <body className="bg-primary-800">
+            <Navbar />
+            <main className="flex mx-auto max-w-6xl justify-center">
+              {children}
+            </main>
+          </body>
+        </html>
+      </ClerkProvider>
+    </CapsulesProvider>
   );
 }
