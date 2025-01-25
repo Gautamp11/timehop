@@ -4,61 +4,93 @@ const { createContext, useState, useContext } = require("react");
 // Sample data for capsules
 const capsulesData = [
   {
-    id: 1,
-    title: "Birthday Surprise",
-    description:
+    id: "capsule1",
+    capsuleName: "Birthday Surprise",
+    capsuleDescription:
       "A special digital time capsule containing messages, photos, and videos from friends and family to be opened on your birthday!",
-    image: "/capsule-image1.png", // Replace with your capsule image path
-    created: true,
+    owner: "user123",
+    sharedWith: ["user456", "user789"],
+    unlockDate: new Date("2025-06-30").toISOString(),
+    capsuleData: {
+      type: "message",
+      content: "Happy Birthday! Hope you have a fantastic year ahead.",
+    },
+    sharedByMe: false,
+    sharedWithMe: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "capsule2",
+    capsuleName: "Travel Adventures",
+    capsuleDescription:
+      "A collection of travel stories, photos, and recommendations from my journeys around the world.",
+    owner: "user123",
+    sharedWith: [],
+    unlockDate: new Date("2025-01-30").toISOString(),
+    capsuleData: {
+      type: "photoAlbum",
+      content: [
+        "https://example.com/photo1.jpg",
+        "https://example.com/photo2.jpg",
+      ],
+    },
     sharedByMe: true,
     sharedWithMe: false,
-    unlockDate: "2025-06-30",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: 2,
-    title: "Travel Adventures",
-    description:
-      "A collection of travel stories, photos, and recommendations from my journeys around the world. Perfect for reliving those adventures!",
-    image: "/capsule-image2.png", // Replace with your capsule image path
-    created: true,
+    id: "capsule3",
+    capsuleName: "Graduation Day",
+    capsuleDescription:
+      "A digital memory capsule with congratulatory messages, photos, and videos from family and friends.",
+    owner: "user456",
+    sharedWith: ["user123"],
+    unlockDate: new Date("2025-10-30").toISOString(),
+    capsuleData: {
+      type: "video",
+      content: "https://example.com/graduation-video.mp4",
+    },
+    sharedByMe: false,
+    sharedWithMe: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "capsule4",
+    capsuleName: "Wedding Memories",
+    capsuleDescription:
+      "Cherish the moments of your special day with photos, videos, and heartfelt messages from loved ones.",
+    owner: "user789",
+    sharedWith: ["user123", "user456"],
+    unlockDate: new Date("2025-03-30").toISOString(),
+    capsuleData: {
+      type: "photoAlbum",
+      content: [
+        "https://example.com/wedding-photo1.jpg",
+        "https://example.com/wedding-photo2.jpg",
+      ],
+    },
+    sharedByMe: false,
+    sharedWithMe: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "capsule5",
+    capsuleName: "Family Traditions",
+    capsuleDescription:
+      "A digital time capsule documenting family recipes, traditions, and stories.",
+    owner: "user123",
+    sharedWith: ["user456"],
+    unlockDate: new Date("2025-05-30").toISOString(),
+    capsuleData: {
+      type: "note",
+      content: "Grandma's secret apple pie recipe: ...",
+    },
     sharedByMe: true,
     sharedWithMe: false,
-    unlockDate: "2025-01-30",
-  },
-  {
-    id: 3,
-    title: "Graduation Day",
-    description:
-      "A digital memory capsule with congratulatory messages, photos, and videos from family and friends to celebrate this milestone!",
-    image: "/capsule-image3.png", // Replace with your capsule image path
-    created: true,
-    sharedByMe: false,
-    sharedWithMe: false,
-    unlockDate: "2025-10-30",
-  },
-  {
-    id: 4,
-    title: "Wedding Memories",
-    description:
-      "Cherish the moments of your special day with a capsule filled with photos, videos, and heartfelt messages from loved ones.",
-    image: "/capsule-image2.png", // Replace with your capsule image path
-    created: false,
-    sharedByMe: false,
-    sharedWithMe: true,
-    unlockDate: "2025-03-30",
-  },
-  {
-    id: 5,
-    title: "Family Traditions",
-    description:
-      "A digital time capsule documenting family recipes, traditions, and stories passed down through generations. Perfect for sharing with future family members!",
-    image: "/capsule-image1.png", // Replace with your capsule image path
-    created: false,
-    sharedByMe: false,
-    sharedWithMe: true,
-    unlockDate: "2025-05-30",
+    createdAt: new Date().toISOString(),
   },
 ];
+
 const CapsulesContext = createContext();
 
 export const CapsulesProvider = ({ children }) => {

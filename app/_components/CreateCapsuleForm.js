@@ -1,6 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useCapsules } from "../_contexts/CapsulesContext";
+import { createCapsule } from "@/actions"; // Import server action
+
+// import { useCapsules } from "../_contexts/CapsulesContext";
+import { uploadCapsuleFile } from "../services/supabaseService";
 
 function CreateCapsuleForm({ onClose }) {
   const {
@@ -10,13 +13,34 @@ function CreateCapsuleForm({ onClose }) {
     formState: { errors },
   } = useForm();
 
-  const { addCapsules } = useCapsules();
+  // const { addCapsules } = useCapsules();
 
-  function onSubmit(data) {
-    // console.log(data);
-    addCapsules(data);
-    reset();
-    onClose();
+  async function onSubmit(data) {
+    try {
+      let filePath = null;
+
+      // handle file upload
+      if (data.file && data.file[0]) {
+        console.log("File found", data.file[0]);
+        const file = data.file[0];
+        filePath = await uploadCapsuleFile(file);
+      }
+
+      const capsuleData = {
+        name: data.name,
+        description: data.description,
+        notes: data.notes || null,
+        filePath,
+        unlockDate: data.unlockDate,
+      };
+
+      await createCapsule(capsuleData);
+
+      reset();
+      onClose();
+    } catch (err) {
+      console.log("Error creating capsule:", err.message);
+    }
   }
 
   return (
@@ -30,11 +54,10 @@ function CreateCapsuleForm({ onClose }) {
       <input
         type="text"
         placeholder="Capsule Name"
-        {...register("title", { required: "Capsule name is required" })}
+        {...register("name", { required: "Capsule name is required" })}
         className="p-2 rounded-md bg-primary-800 text-primary-50 outline-none"
       />
       {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-
       <textarea
         placeholder="Description"
         {...register("description", { required: "Description is required" })}
@@ -42,15 +65,18 @@ function CreateCapsuleForm({ onClose }) {
       />
       {errors.description && (
         <p className="text-red-500">{errors.description.message}</p>
-      )}
-
+      )}{" "}
+      <textarea
+        placeholder="Keep a note with data or just wanna send a note?"
+        {...register("notes")}
+        className="p-2 rounded-md bg-primary-800 text-primary-50 outline-none"
+      />
       <input
         type="file"
-        {...register("image")}
-        className="p-2 rounded-md bg-primary-800 text-primary-50 "
+        {...register("file")}
+        className="p-2 rounded-md bg-primary-800 text-primary-50"
       />
-      {errors.image && <p className="text-red-500">{errors.image.message}</p>}
-
+      {errors.file && <p className="text-red-500">{errors.file.message}</p>}
       <input
         type="date"
         {...register("unlockDate", { required: "Unlock date is required" })}
@@ -59,7 +85,6 @@ function CreateCapsuleForm({ onClose }) {
       {errors.unlockDate && (
         <p className="text-red-500">{errors.unlockDate.message}</p>
       )}
-
       <button
         type="submit"
         className="bg-accent-500 text-primary-50 py-2 px-4 rounded-md font-semibold hover:bg-accent-600"

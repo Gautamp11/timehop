@@ -1,26 +1,17 @@
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
 
-function Capsules({ activeCategory, handleCategoryChange, capsules }) {
-  const filteredCapsules = useMemo(() => {
-    switch (activeCategory) {
-      case "myCapsules":
-        return capsules.filter((capsule) => capsule.created);
-      case "sharedByMe":
-        return capsules.filter((capsule) => capsule.sharedByMe);
-      case "sharedWithMe":
-        return capsules.filter((capsule) => capsule.sharedWithMe);
-      default:
-        return capsules;
-    }
-  }, [activeCategory, capsules]);
-
+function Capsules({
+  activeCategory,
+  handleCategoryChange,
+  capsules,
+  onShareCapsule,
+}) {
   return (
     <div className="p-8">
       {/* Category Switcher */}
       <div className="flex justify-around mb-6">
         <button
-          className={`trans py-2 px-4 rounded-lg ${
+          className={`py-2 px-4 rounded-lg ${
             activeCategory === "myCapsules"
               ? "bg-accent-500 text-primary-50"
               : "bg-primary-800 text-primary-200"
@@ -52,31 +43,45 @@ function Capsules({ activeCategory, handleCategoryChange, capsules }) {
       </div>
 
       {/* Capsules Section */}
-      <div className="grid grid-cols-1 gap-8">
-        {filteredCapsules.map((capsule) => (
-          <div
-            key={capsule.id}
-            className="relative bg-primary-700 p-4 rounded-lg shadow-lg flex "
-          >
-            <img
-              src={capsule.image}
-              alt={capsule.title}
-              className=" max-h-32 rounded-lg mr-4 "
-            />
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-primary-50">
-                {capsule.title}
-              </h2>
-              <p className="text-primary-200">{capsule.description}</p>
-              <Link
-                href={`/dashboard/capsules/${capsule.id}`}
-                className="mt-2 bg-accent-500 hover:bg-accent-600 text-primary-50 py-1 px-3 rounded-lg"
-              >
-                Open Capsule
-              </Link>
+      <div className="grid grid-cols-1 gap-8 w-full">
+        {capsules.length > 0 ? (
+          capsules.map((capsule) => (
+            <div
+              key={capsule.id}
+              className="relative bg-primary-700 p-4 rounded-lg shadow-lg flex space-y-2"
+            >
+              <img
+                src="/capsule-1.png"
+                alt={capsule.name}
+                className="max-h-32 rounded-lg mr-4"
+              />
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-primary-50">
+                  {capsule.name}
+                </h2>
+                <p className="text-primary-200 mb-2">{capsule.description}</p>
+                <div className="space-x-2">
+                  <Link
+                    href={`/dashboard/capsules/${capsule.id}`}
+                    className="bg-accent-500 hover:bg-accent-600 text-primary-50 py-1 px-3 rounded-lg"
+                  >
+                    Open Capsule
+                  </Link>
+                  <button
+                    onClick={() => onShareCapsule(capsule.id)}
+                    className="bg-primary-500 hover:bg-accent-600 text-primary-50 py-1 px-3 rounded-lg"
+                  >
+                    Share Capsule
+                  </button>
+                </div>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="text-primary-50 text-xl font-bold mt-8 text-center">
+            No Capsules to show
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
