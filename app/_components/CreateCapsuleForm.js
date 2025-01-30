@@ -1,27 +1,35 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { createCapsule } from "@/actions"; // Import server action
-
-// import { useCapsules } from "../_contexts/CapsulesContext";
+import { createCapsule, updateCapsule } from "@/actions"; // Import server actions
 import { uploadCapsuleFile } from "../services/supabaseService";
+import useFramerMotion from "../_utils/useFramerMotion";
+import { motion } from "framer-motion";
 
-function CreateCapsuleForm({ onClose }) {
+function CreateCapsuleForm({ onClose, editCapsule }) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: editCapsule
+      ? {
+          name: editCapsule.name,
+          description: editCapsule.description,
+          notes: editCapsule.notes,
+          unlockDate: editCapsule.unlockDate,
+        }
+      : {},
+  });
 
-  // const { addCapsules } = useCapsules();
+  const { containerVariants, capsuleVariants } = useFramerMotion();
 
   async function onSubmit(data) {
     try {
-      let filePath = null;
+      let filePath = editCapsule ? editCapsule.filePath : null;
 
-      // handle file upload
+      // Handle file upload if a new file is provided
       if (data.file && data.file[0]) {
-        console.log("File found", data.file[0]);
         const file = data.file[0];
         filePath = await uploadCapsuleFile(file);
       }
@@ -34,22 +42,31 @@ function CreateCapsuleForm({ onClose }) {
         unlockDate: data.unlockDate,
       };
 
-      await createCapsule(capsuleData);
+      if (editCapsule) {
+        // Update the capsule if in edit mode
+        await updateCapsule({ capsuleData, id: editCapsule.id });
+      } else {
+        // Create a new capsule if in create mode
+        await createCapsule(capsuleData);
+      }
 
       reset();
       onClose();
     } catch (err) {
-      console.log("Error creating capsule:", err.message);
+      console.log("Error:", err.message);
     }
   }
 
   return (
-    <form
+    <motion.form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4 mt-4"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
     >
       <h2 className="text-2xl font-bold text-primary-50 mb-2">
-        Create Capsule 💟
+        {editCapsule ? "Edit Capsule ✏️" : "Create Capsule 💟"}
       </h2>
       <input
         type="text"
@@ -65,7 +82,7 @@ function CreateCapsuleForm({ onClose }) {
       />
       {errors.description && (
         <p className="text-red-500">{errors.description.message}</p>
-      )}{" "}
+      )}
       <textarea
         placeholder="Keep a note with data or just wanna send a note?"
         {...register("notes")}
@@ -87,11 +104,18 @@ function CreateCapsuleForm({ onClose }) {
       )}
       <button
         type="submit"
+        disabled={isSubmitting}
         className="bg-accent-500 text-primary-50 py-2 px-4 rounded-md font-semibold hover:bg-accent-600"
       >
-        Create
+        {!isSubmitting
+          ? editCapsule
+            ? "Save Changes"
+            : "Create"
+          : editCapsule
+          ? "Saving..."
+          : "Creating..."}
       </button>
-    </form>
+    </motion.form>
   );
 }
 

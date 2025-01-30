@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { CapsulesProvider } from "./_contexts/CapsulesContext";
+import { ToastContainer } from "react-toastify";
 
 // If loading a variable font, you don't need to specify the font weight
 const exo = Exo({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
             <main className="flex mx-auto max-w-6xl justify-center">
               {children}
             </main>
+            <ToastContainer />
           </body>
         </html>
       </ClerkProvider>

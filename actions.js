@@ -3,6 +3,7 @@
 import { supabase } from "@/supabase";
 import { currentUser } from "@clerk/nextjs/server";
 import { uploadCapsuleFile } from "./app/services/supabaseService";
+import { revalidatePath } from "next/cache";
 
 export async function createCapsule(data) {
   try {
@@ -18,6 +19,7 @@ export async function createCapsule(data) {
       ownerId,
       unlockDate,
     });
+    revalidatePath("/dashboard");
     return insertData;
   } catch (err) {
     console.error("Error creating capsule:", err.message);
@@ -38,6 +40,32 @@ export async function getCapsules(userId) {
     throw new Error("Failed to fetch capsules.");
   }
 }
+export async function getAllCapsules() {
+  try {
+    const { data, error } = await supabase.from("capsules").select("*");
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.error("Error fetching capsules:", err.message);
+    throw new Error("Failed to fetch capsules.");
+  }
+}
+
+// Fetch capsules by IDs
+export async function getCapsulesByIds(capsuleIds) {
+  try {
+    const { data, error } = await supabase
+      .from("capsules")
+      .select("*")
+      .in("id", capsuleIds);
+
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.error("Error fetching capsules by IDs:", err.message);
+    return [];
+  }
+}
 
 export async function getCapsuleById(id) {
   try {
@@ -54,15 +82,51 @@ export async function getCapsuleById(id) {
   }
 }
 
-export async function getUsers() {
-  let { data: users, error } = await supabase.from("users").select("*");
+// export async function getUsers() {
+//   let { data: users, error } = await supabase.from("users").select("*");
+
+//   if (error) {
+//     console.error("Error fetching users:", error.message);
+//     throw new Error("Failed to fetch users.");
+//   }
+
+//   return { users, error };
+// }
+
+export async function getUsers(searchQuery = "") {
+  if (!searchQuery.trim()) return { users: [], error: null }; // No API call if search query is empty
+
+  let { data: users, error } = await supabase
+    .from("users")
+    .select("*")
+    .ilike("username", `%${searchQuery}%`); // Case-insensitive search
 
   if (error) {
     console.error("Error fetching users:", error.message);
-    throw new Error("Failed to fetch users.");
+    return { users: [], error };
   }
 
   return { users, error };
+}
+
+export async function updateCapsule({ capsuleData, id }) {
+  try {
+    const { data, error } = await supabase
+      .from("capsules")
+      .update(capsuleData)
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      throw new Error(`Error updating capsule: ${error.message}`);
+    }
+    revalidatePath("/dashboard");
+
+    return data;
+  } catch (err) {
+    console.error("Update failed:", err);
+    throw err; // Re-throw for the caller to handle
+  }
 }
 
 export async function shareCapsule(capsuleId, sharedBy, sharedWith) {
@@ -102,7 +166,7 @@ export async function getSharedCapsules(userId) {
     const { data, error } = await supabase
       .from("sharedCapsules")
       .select("*")
-      .or(`sharedBy.eq.${userId},sharedWith.eq.${userId}`);
+      .or(`sharedWith.eq.${userId},sharedBy.eq.${userId}`);
 
     if (error) throw new Error(error.message);
 

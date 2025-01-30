@@ -1,12 +1,16 @@
 import { getCapsuleById } from "@/actions";
 import { CapusleDetails } from "@/app/_components/CapsuleDetails";
-import Link from "next/link";
 import { Suspense } from "react";
+import { auth } from "@clerk/nextjs/server";
+
 // import { useState, useEffect } from "react";
 
 export default async function Page({ params }) {
   const { id } = params;
   const { data: capsule, error } = await getCapsuleById(id);
+  const { userId } = auth();
+
+  const isOwner = capsule?.ownerId === userId;
 
   return (
     <Suspense
@@ -16,7 +20,7 @@ export default async function Page({ params }) {
         </div>
       }
     >
-      <CapusleDetails capsule={capsule} error={error} />
+      <CapusleDetails capsule={capsule} error={error} isOwner={isOwner} />
     </Suspense>
   );
 }
