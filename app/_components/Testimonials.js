@@ -1,5 +1,8 @@
 "use client";
-import { useState } from "react";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import useFramerMotion from "../_utils/useFramerMotion";
 
 const testimonials = [
   {
@@ -17,55 +20,47 @@ const testimonials = [
     text: "The interface is simple, but it's packed with great features!",
     author: "User 3",
   },
-  // You can add more testimonials here
 ];
 
 export default function Testimonials() {
+  const { capsuleVariants } = useFramerMotion();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const totalSlides = testimonials.length;
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === testimonials.length - 1 ? 0 : prev + 1
+      );
+    }, 5000); // Auto-slide every 5 seconds
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
-  };
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="flex flex-col justify-center py-8 my-12">
-      <h2 className="text-4xl text-accent-400 p-8 font-bold text-center ">
+    <section className="flex flex-col items-center justify-center py-12 my-12 text-white">
+      <h2 className="text-4xl font-bold text-center text-accent-400 p-6">
         What <span className="text-primary-100">People</span> Say
       </h2>
 
-      <div className="relative w-full overflow-hidden">
-        <div
-          className="flex transition-transform duration-500"
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={testimonial.id}
-              className="min-w-full h-48 bg-primary-700 p-14  rounded-lg flex flex-col justify-between items-center"
-            >
-              <p className="text-primary-200 text-xl">{testimonial.text}</p>
-              <span className="text-accent-400 text-lg">
-                {testimonial.author}
-              </span>
-            </div>
-          ))}
-        </div>
-        <button
-          onClick={prevSlide}
-          className="mx-4 absolute -left-0 top-1/2 -translate-y-1/2 bg-accent-400 rounded-full p-2 font-bold  text-primary-900 hover:bg-accent-500"
-        >
-          &lt;
-        </button>{" "}
-        <button
-          onClick={nextSlide}
-          className="mx-4 absolute right-0 top-1/2 -translate-y-1/2 bg-accent-400 rounded-full p-2 font-bold  text-primary-900 hover:bg-accent-500 "
-        >
-          &gt;
-        </button>
+      <div className="relative w-full h-64 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            className="absolute w-full h-48 bg-gradient-to-b from-primary-800 to-primary-700  p-6 rounded-lg flex flex-col justify-around items-center shadow-sm"
+            variants={capsuleVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={{ duration: 0.5 }}
+          >
+            <p className="text-xl text-gray-300 text-center">
+              {testimonials[currentSlide].text}
+            </p>
+            <span className="text-lg text-accent-500 font-semibold">
+              {testimonials[currentSlide].author}
+            </span>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
