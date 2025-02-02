@@ -1,4 +1,4 @@
-import { getCapsuleById } from "@/actions";
+import { getCapsuleById, getSharedWithList } from "@/actions";
 import { CapusleDetails } from "@/app/_components/CapsuleDetails";
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
@@ -8,6 +8,9 @@ import { auth } from "@clerk/nextjs/server";
 export default async function Page({ params }) {
   const { id } = params;
   const { data: capsule, error } = await getCapsuleById(id);
+  const sharedWith = await getSharedWithList(id);
+  console.log(sharedWith);
+
   const { userId } = auth();
 
   const isOwner = capsule?.ownerId === userId;
@@ -20,7 +23,12 @@ export default async function Page({ params }) {
         </div>
       }
     >
-      <CapusleDetails capsule={capsule} error={error} isOwner={isOwner} />
+      <CapusleDetails
+        capsule={capsule}
+        error={error}
+        isOwner={isOwner}
+        sharedWith={sharedWith}
+      />
     </Suspense>
   );
 }

@@ -21,7 +21,7 @@ const getCapsuleLockStatus = (unlockDate) => {
   return { isLocked, daysToUnlock };
 };
 
-export function CapusleDetails({ capsule, error, isOwner }) {
+export function CapusleDetails({ capsule, error, isOwner, sharedWith }) {
   const { isLocked, daysToUnlock } = getCapsuleLockStatus(capsule?.unlockDate);
   const { containerVariants, capsuleVariants } = useFramerMotion();
   const [openEditForm, setOpenEditForm] = useState(false);
@@ -44,7 +44,7 @@ export function CapusleDetails({ capsule, error, isOwner }) {
 
   return (
     <motion.div
-      className="text-primary-50 flex flex-col items-center gap-8 w-full max-w-3xl mx-auto rounded-md p-4 bg-primary-700 shadow-lg mt-2"
+      className="text-primary-50 gap-8 w-full max-w-4xl mx-auto rounded-md p-6 bg-primary-700 shadow-lg mt-4 "
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -56,29 +56,27 @@ export function CapusleDetails({ capsule, error, isOwner }) {
         {capsule.name}
       </motion.h2>
 
-      <motion.div
-        className="flex flex-col gap-8 items-center sm:w-3/4 "
-        variants={containerVariants}
-      >
-        <div
-          className="flex flex-col items-center gap-6"
-          variants={capsuleVariants}
+      {/* Grid Layout for Left and Right Sections */}
+      <div className="flex flex-wrap gap-4 justify-around sm:flex-nowrap p-6">
+        {/* Left Side: Capsule Details */}
+        <motion.div
+          className="flex flex-col items-center flex-1 "
+          variants={containerVariants}
         >
           <img
             src="/capsule-1.png"
             alt={`${capsule.name} capsule`}
             className="w-36 h-36 rounded-lg shadow-xl transition-transform duration-300 hover:scale-105"
             aria-label="Capsule image"
-            variants={capsuleVariants}
           />
 
-          <p className="text-center text-primary-300 text-md sm:text-lg">
+          <p className="text-center text-primary-300 text-md sm:text-lg mt-4">
             {capsule.description}
           </p>
 
-          <div className="flex flex-col gap-4 items-center">
+          <div className="flex flex-col gap-4 items-center w-full mt-4">
             {isOwner ? (
-              <div className="text-center flex flex-col gap-2 rounded-md p-4 shadow-xl transition-all hover:scale-105 transform duration-300">
+              <div className="text-center flex flex-col gap-3 rounded-md p-4 shadow-xl transition-all hover:scale-105 transform duration-300 ">
                 {capsule.filePath ? (
                   <Link
                     href={`${capsule?.filePath}`}
@@ -132,7 +130,7 @@ export function CapusleDetails({ capsule, error, isOwner }) {
               </>
             ) : (
               <div className="text-center flex flex-col gap-2 bg-primary-600 rounded-md p-4 shadow-lg">
-                <p className=" text-primary-50 font-bold text-xl mt-2 mb-2">
+                <p className="text-primary-50 font-bold text-xl mt-2 mb-2">
                   Capsule is unlocked!
                 </p>
                 <Link
@@ -144,30 +142,48 @@ export function CapusleDetails({ capsule, error, isOwner }) {
                 <h2 className="text-lg mt-2">{capsule?.notes}</h2>
               </div>
             )}
+            <Link
+              href="/dashboard"
+              className="text-lg text-primary-50 bg-accent-500 p-2 rounded-md hover:bg-accent-600 transition duration-200"
+              aria-label="Go back to dashboard"
+            >
+              Go Back to Dashboard
+            </Link>
           </div>
-        </div>
+        </motion.div>
+        {/* Right Side: Shared With Users */}
+        {isOwner && (
+          <div className="bg-primary-800 rounded-md p-6 shadow-lg w-1/2 ">
+            <h3 className="text-lg font-semibold mb-3">Shared With</h3>
 
-        {/* Edit Form Modal */}
-        {openEditForm && (
-          <Modal onClose={() => setOpenEditForm(false)}>
-            <CreateCapsuleForm
-              onClose={() => setShowCreateModal(false)}
-              editCapsule={capsule}
-            />
-          </Modal>
+            {sharedWith.length > 0 ? (
+              <ul className="text-primary-200 space-y-2 bg-primary-600 p-2 rounded-md">
+                {sharedWith.map((shared) => (
+                  <li key={shared.users.id} className="text-md ">
+                    {shared.users.username}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm italic text-gray-400">
+                Not shared with anyone.
+              </p>
+            )}
+          </div>
         )}
-      </motion.div>
+      </div>
+      {/* Edit Form Modal */}
+      {openEditForm && (
+        <Modal onClose={() => setOpenEditForm(false)}>
+          <CreateCapsuleForm
+            onClose={() => setShowCreateModal(false)}
+            editCapsule={capsule}
+          />
+        </Modal>
+      )}
 
       {/* Share capsule modal */}
       {openShareForm && <ShareCapsuleModal></ShareCapsuleModal>}
-
-      <Link
-        href="/dashboard"
-        className="text-lg text-primary-50 bg-accent-500 p-2 rounded-md hover:bg-accent-600 transition duration-200"
-        aria-label="Go back to dashboard"
-      >
-        Go Back to Dashboard
-      </Link>
     </motion.div>
   );
 }

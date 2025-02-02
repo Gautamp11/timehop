@@ -8,7 +8,7 @@ export default function Hero() {
 
   return (
     <section
-      className="hero relative h-screen flex flex-col justify-center items-center text-center overflow-hidden
+      className="hero relative h-screen flex flex-col justify-center !w-full items-center text-center overflow-hidden
     bg-gradient-to-tr from-primary-800 via-primary-800 to-accent-900  z-0
     "
     >

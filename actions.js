@@ -176,3 +176,19 @@ export async function getSharedCapsules(userId) {
     return [];
   }
 }
+
+export async function getSharedWithList(capsuleId) {
+  const { data, error } = await supabase
+    .from("sharedCapsules")
+    .select(
+      `sharedWith, users:sharedWith ( id, username, email )` // Ensure proper relation aliasing
+    )
+    .eq("capsuleId", capsuleId);
+
+  if (error) {
+    console.error("Error fetching shared with details:", error.message);
+    throw new Error(error.message);
+  }
+
+  return data;
+}
