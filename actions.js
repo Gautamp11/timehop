@@ -140,15 +140,15 @@ export async function shareCapsule(capsuleId, sharedBy, sharedWith) {
   try {
     // Prepare data for batch insertion
     const sharedCapsulesData = sharedWith.map((userId) => ({
-      capsuleId,
-      sharedBy,
+      capsuleId: capsuleId,
+      sharedBy: sharedBy,
       sharedWith: userId,
     }));
 
-    // Insert shared capsule records
+    // Use upsert to prevent duplicate entries
     const { data, error } = await supabase
       .from("sharedCapsules")
-      .insert(sharedCapsulesData);
+      .upsert(sharedCapsulesData, { onConflict: "capsuleId, sharedWith" });
 
     if (error) {
       throw new Error(error.message);
@@ -180,9 +180,7 @@ export async function getSharedCapsules(userId) {
 export async function getSharedWithList(capsuleId) {
   const { data, error } = await supabase
     .from("sharedCapsules")
-    .select(
-      `sharedWith, users:sharedWith ( id, username, email )` // Ensure proper relation aliasing
-    )
+    .select(`sharedWith, users:sharedWith ( id, username, email )`)
     .eq("capsuleId", capsuleId);
 
   if (error) {

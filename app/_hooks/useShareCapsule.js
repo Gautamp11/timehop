@@ -58,6 +58,8 @@ export default function useShareCapsule(userId) {
         selectedUsers
       );
 
+      if (error) throw new Error(error.message);
+
       console.log("Capsule shared successfully:", data);
       toast.success("Capsule shared successfully!");
     } catch (error) {

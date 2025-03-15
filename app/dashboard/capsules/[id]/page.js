@@ -9,7 +9,6 @@ export default async function Page({ params }) {
   const { id } = params;
   const { data: capsule, error } = await getCapsuleById(id);
   const sharedWith = await getSharedWithList(id);
-  console.log(sharedWith);
 
   const { userId } = auth();
 
